@@ -10,7 +10,21 @@ const CreatePost = () => {
 	const [img, setImg] = useState(null);
 	const imgRef = useRef(null);
 
-	const { data: authUser } = useQuery({ queryKey: ["authUser"] });
+	const { data: authUser, isLoading } = useQuery({
+		queryKey: ["authUser"],
+		queryFn: async () => {
+			const res = await fetch("/api/auth/me");
+			const data = await res.json();
+			if (data.error) return null;
+			if (!res.ok) {
+				throw new Error(data.error || "Something went wrong");
+			}
+			console.log("authUser is here:", data);
+			return data;
+		},
+		retry: false,
+	});
+	
 	const queryClient = useQueryClient();
 
 	const {
